@@ -395,10 +395,11 @@ map225_ext <- mutate(
                      endyear = ifelse(endyear > 2004, 2050, endyear)
                      )
 
-hsfclmap3 <- bind_rows(
-          hsfclmap3 %>% filter(area != 225),
-          map225_ext
-          )
+hsfclmap3_subset <- hsfclmap3 %>% filter(area != 225)
+
+map225_ext$recordnumb <- max(hsfclmap3_subset$recordnumb) + 1:nrow(map225_ext)
+
+hsfclmap3 <- bind_rows(hsfclmap3_subset, map225_ext)
 
 # / END fix country specific mapping
 
