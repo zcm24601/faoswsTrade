@@ -354,6 +354,54 @@ flog.debug("[%s] Reading in hs-fcl mapping", PID, name = "dev")
 #data("hsfclmap3", package = "hsfclmap", envir = environment())
 hsfclmap3 <- tbl_df(ReadDatatable("hsfclmap3"))
 
+# See issue 127. The fix is done for a single country on purpose.
+# TODO A general approach should be designed.
+
+# FAL = 255, M49 = 784
+map225 <- filter(hsfclmap3, area == 225)
+
+replicate_rows <- function(data) {
+  res <- data.frame(
+             leading = stringr::str_sub(data$fromcode, 1, 1),
+             area = data$area,
+             flow = data$flow,
+             fromcode = as.numeric(data$fromcode):as.numeric(data$tocode),
+             tocode = as.numeric(data$fromcode):as.numeric(data$tocode),
+             fcl = data$fcl,
+             startyear = as.integer(data$startyear),
+             endyear = as.integer(data$endyear),
+             recordnumb = data$recordnumb
+             )
+
+  res <- mutate(res,
+                fromcode = ifelse(leading == '0',
+                                  paste0('0', fromcode),
+                                  as.character(fromcode)),
+                tocode = fromcode)
+
+  return(res %>% select(-leading))
+}
+
+
+map225_ext <- plyr::mdply(1:nrow(map225),
+                          function(x) replicate_rows(map225[x,]),
+                          .progress = "text") %>%
+  tbl_df() %>%
+  select(-X1)
+
+map225_ext <- mutate(
+                     map225_ext,
+                     startyear = ifelse(startyear == 2005, 2004, startyear),
+                     endyear = ifelse(endyear > 2004, 2050, endyear)
+                     )
+
+hsfclmap3 <- bind_rows(
+          hsfclmap3 %>% filter(area != 225),
+          map225_ext
+          )
+
+# / END fix country specific mapping
+
 flog.info("HS->FCL mapping table preview:",
           rprt_glimpse0(hsfclmap3), capture = TRUE)
 
