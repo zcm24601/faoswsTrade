@@ -1360,6 +1360,35 @@ if(NROW(fcl_spec_mt_conv) > 0){
   tldata$qtyfcl = NA
 }
 
+
+
+# FIX for UAE: animals weight given by Claudia and Katherine on 20170628
+uae_specific_conversions <- frame_data(
+~fcl, ~conv_uae, ~reporter,
+ 866,  1/350, 225L,
+ 976,  1/50, 225L,
+ 1016, 1/25, 225L,
+ 1057, (1/0.06)/1000, 225L,
+ 1096, 1/500, 225L,
+ 1126, 1/300, 225L
+)
+
+tldata <- tldata %>%
+  left_join(uae_specific_conversions, by = c("reporter", "fcl")) %>%
+  mutate(qtyfcl = ifelse(!is.na(conv_uae), weight * conv_uae, qtyfcl))
+
+# XXX
+# Flag on weight as qty (which underwent a change) will populate weight
+tldata <- tldata %>%
+  setFlag3(!is.na(conv_uae), type = 'method', flag = 'i', variable = 'weight')
+
+
+# XXX modify flags
+
+# / FIX for UAE: animals weight given by Claudia and Katherine
+
+
+
 ##' 1. If the `weight` variable is available and the final unit
 ##' of measurement is tonnes then `weight` is used as `quantity`
 
@@ -1371,6 +1400,12 @@ tldata$qtyfcl <- ifelse(cond, tldata$weight*0.001, tldata$qtyfcl)
 # Flag on weight as qty (which underwent a change) will populate weight
 tldata <- tldata %>%
   setFlag3(cond, type = 'method', flag = 'i', variable = 'weight')
+
+
+
+
+
+
 
 ######### Value from USD to thousands of USD
 
