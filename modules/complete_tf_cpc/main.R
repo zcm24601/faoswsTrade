@@ -2374,7 +2374,9 @@ unmapped_codes <- frame_data(
 299,2,"220600","220600",517,2014,2050,5925002,"Generic HS2012 to FCL (could also be mapped to 26,39)","Cider, perry, mead and other fermented beverages and mixtures of fermented beverages and non-alcoholic beverages, n.e.s. (excluding beer, wine or fresh grapes, grape must, vermouth and other wine of fresh grapes flavoured with plants or aromatic substances)",
 299,2,"230990","230990",845,2014,2050,5925003,"Generic HS2012 to FCL (could also be mapped to 653,840,841,842,843,849,850,851,852,853,854,855,1259)","Preparations of a kind used in animal feeding (excluding dog or cat food put up for retail sale)",
 299,2,"330129","330129",753,2014,2050,5925004,"Generic HS2012 to FCL (could also be mapped to 948)","Essential oils, whether or not terpeneless, incl. concretes and absolutes (excluding those of citrus fruit and mint)",
-299,2,"410120","410120",920,2014,2050,5925005,"Generic HS2012 to FCL (could also be mapped to 921,922,928,929,930,958,959,1103,1104,1105)","Whole raw hides and skins of bovine incl. buffalo or equine animals, whether or not dehaired, unsplit, of a weight per skin <= 8 kg when simply dried, <= 10 kg when dry-salted, or <= 16 kg when fresh, wet-salted or otherwise preserved (excluding tanned, parchment-dressed or further prepared)"
+299,2,"410120","410120",920,2014,2050,5925005,"Generic HS2012 to FCL (could also be mapped to 921,922,928,929,930,958,959,1103,1104,1105)","Whole raw hides and skins of bovine incl. buffalo or equine animals, whether or not dehaired, unsplit, of a weight per skin <= 8 kg when simply dried, <= 10 kg when dry-salted, or <= 16 kg when fresh, wet-salted or otherwise preserved (excluding tanned, parchment-dressed or further prepared)",
+7,1,"23070000","23070000",654,2007,2050,5924005,"Standard_HS12","FaoStatName: FOOD WASTES",
+7,1,"23099000","23099000",654,2007,2050,5924008,"Country TL description (WITS), Old SWS series (could also be mapped to 653,840,841,842,843,845,849,850,851,852,853,854,855,1259)","Preparations of a kind used in animal feeding (excl. dog or cat food put up for retail sale)"
 )
 
 unmapped_codes <- select(unmapped_codes, -details, -tl_description)
