@@ -136,6 +136,8 @@ flagWeightTable_status <- frame_data(
 )
 
 # This shouldn't ever be needed as all values are a sum ("s")
+# XXX No, not really: there are some reporters that for some
+# commodities and flow have just one partner
 flagWeightTable_method <- frame_data(
   ~flagObservationStatus, ~flagObservationWeights,
   'h',                   1.00,
@@ -153,6 +155,43 @@ total_trade_cpc_wo_uv <- completetrade %>%
              flagObservationStatus = ~aggregateObservationFlag(flagObservationStatus, flagTable = flagWeightTable_status)) %>%
   ungroup() %>%
   dplyr::mutate(flagMethod = "s")
+
+# Data for which weight and numbers were computed
+# (n == 4 => (value, qty) * (import, export)
+qty_and_weight <-
+    completetrade %>%
+    group_by(measuredItemCPC) %>%
+    summarise(n = n_distinct(measuredElementTrade)) %>%
+    filter(n > 4) %>%
+    mutate(out = TRUE) %>%
+    select(-n)
+
+qty_and_weight <-
+  bind_rows(
+    mutate(qty_and_weight, measuredElementTrade = '5610'),
+    mutate(qty_and_weight, measuredElementTrade = '5910')
+  )
+
+# Keep only weights of livestock
+total_trade_cpc_weight_livestock <-
+  left_join(
+    total_trade_cpc_wo_uv,
+    qty_and_weight,
+    by = c("measuredItemCPC", "measuredElementTrade")
+  ) %>%
+  filter(out) %>%
+  select(-out)
+
+# Remove weights of livestok (keeping heads)
+total_trade_cpc_wo_uv <-
+  left_join(
+    total_trade_cpc_wo_uv,
+    qty_and_weight,
+    by = c("measuredItemCPC", "measuredElementTrade")
+  ) %>%
+  filter(is.na(out)) %>%
+  select(-out)
+
 
 ##' # Calculate Unit Values
 ##'
@@ -217,8 +256,11 @@ total_trade_cpc_uv <-
 
 
 total_trade_cpc_w_uv <-
-  total_trade_cpc_wo_uv %>%
-  bind_rows(total_trade_cpc_uv) %>%
+  bind_rows(
+    total_trade_cpc_uv,
+    total_trade_cpc_wo_uv,
+    total_trade_cpc_weight_livestock
+  ) %>%
   data.table::as.data.table()
 
 table(total_trade_cpc_w_uv$flagObservationStatus, total_trade_cpc_w_uv$flagMethod)
